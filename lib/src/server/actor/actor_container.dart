@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../../fennec.dart';
 
 /// [ActorContainer] used to send different events to connected Agents depending on Action using [SendPort]
 class ActorContainer {

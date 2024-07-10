@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 abstract class IsolateAction {}
 

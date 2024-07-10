@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../../fennec.dart';
 
 /// [Actor] is an abstract superclass, where all their subclasses will be executed separately in each instance.
 /// [Actor] is used to ensure sharing Data between multiples Isolates.

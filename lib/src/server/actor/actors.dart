@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../../fennec.dart';
 
 ///[Actors] is used to initialize all Connected Actors.
 class Actors {
@@ -41,7 +41,7 @@ class Actors {
 
       if (error != null) {
         throw Exception(
-            'an error occurred in the actor with name: ${actor.name}.\n\ Actor error:\n\n${error!.error}\n\n Actor stack trace:\n\n${error!.stackTrace}');
+            'an error occurred in the actor with name: ${actor.name}.\n Actor error:\n\n${error!.error}\n\n Actor stack trace:\n\n${error!.stackTrace}');
       }
 
       _actorContainers.add(ActorContainer(actor.name, supervisor.isolatePort!));

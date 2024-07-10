@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 class IsolateError {
   final Object error;

@@ -1,21 +1,20 @@
-part of fennec;
+part of '../../fennec.dart';
 
 class ServerTaskHandler extends IsolateTaskHandler {
   late final int _instance;
   late final bool shared;
   final ServerInput serverInput;
-  late TemplateRender templateRender;
   late ServerContext serverContext;
 
   late final Server server;
 
-  ServerTaskHandler(this._instance, this.shared, this.templateRender,
-      this.serverInput, this.serverContext);
+  ServerTaskHandler(
+      this._instance, this.shared, this.serverInput, this.serverContext);
 
   @override
   Future<void> onStart(IsolateContext context) async {
     try {
-      server = Server(serverInput, templateRender, serverContext);
+      server = Server(serverInput, serverContext);
       final ServerInfo serverInfo = await server.startServer(_instance, shared);
       context.send(IsolateServerInfo(serverInfo));
     } catch (error, stackTrace) {

@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 class Utils {
   /// [isValidURl] a static method to check validity of requested uri.

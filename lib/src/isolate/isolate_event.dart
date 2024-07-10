@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 ///[IsolateEvent] is an abstract class to define all Event of Isolate.
 abstract class IsolateEvent {}

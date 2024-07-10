@@ -1,13 +1,7 @@
-part of fennec;
+part of '../fennec.dart';
 
 /// [Application] is a class that contains the application.
 class Application {
-  /// [cached] is a [Map] that contains the cached data of the application.
-  late Map<String, dynamic> cached;
-
-  /// [_engines] is a [Map] that contains the engines of the application.
-  final Map<String, Engine> _engines = {};
-
   CorsOptions? corsOptions;
   final List<MiddlewareHandler> middlewares = [];
 
@@ -23,66 +17,14 @@ class Application {
 
   Application._internal();
 
-  /// [render] is a method that renders a view.
-  void render(String fileName, Map<String, dynamic>? locals,
-      Function(dynamic, String?) callback,
-      {Map<String, dynamic> parameters = const {}}) {
-    final view = _getViewFromFileName(fileName);
-    view.render(locals, parameters, callback);
-  }
-
-  /// [renderHtmlAsString] is a method that renders a html file by a String.
-  String renderHtmlAsString(String html,
-      {Map<String, dynamic> parameters = const {}}) {
-    return HtmlEngine.renderHtmlAsString(html, parameters: parameters);
-  }
-
-  View _getViewFromFileName(String fileName) {
-    View? view;
-    if (_instance.cache) {
-      view = _instance.cached[fileName];
-    }
-    if (view == null) {
-      view = View(fileName, _instance._engines,
-          defaultEngine: _instance.viewEngine, rootPath: _instance.viewPath);
-
-      if (view.filePath == null) {
-        late String dirs;
-        if (view.rootPath is List) {
-          dirs =
-              'directories "${view.rootPath.join(', ')}" or "${view.rootPath[view.rootPath.length - 1]}"';
-        } else {
-          dirs = 'directory "${view.rootPath}"';
-        }
-        throw ViewException(view, dirs);
-      }
-    }
-    if (_instance.cache) {
-      _instance.cached[fileName] = view;
-    }
-    return view;
-  }
-
-  ///[cached] is a boolean for enabling caching
-  bool cache = false;
-
   ///[host] represents host of the server
   dynamic host = '0.0.0.0';
 
   ///[port] represents port of the server
   int port = 8000;
 
-  bool socketIOServer = false;
-  bool webSocket = false;
-
   ///[securityContext] represents if you bind your server secure
   SecurityContext? securityContext;
-
-  ///[viewPath] represents the default path of views
-  String viewPath = path.join(path.current, 'views');
-
-  ///[viewEngine] represents the used viewEngine
-  String viewEngine = 'html';
 
   /// [numberOfIsolates] is a [int] that contains the number of isolates of the application.
   int numberOfIsolates = 1;
@@ -117,13 +59,6 @@ class Application {
     return this;
   }
 
-  /// [setCache] is a method that enable caching of the application.
-  /// by default it's set to false.
-  Application setCache(bool cache) {
-    this.cache = cache;
-    return this;
-  }
-
   /// [setHost] is a method that sets the host of server of the application.
   /// by default it's set to '0.0.0.0'.
   Application setHost(dynamic host) {
@@ -155,33 +90,10 @@ class Application {
     return this;
   }
 
-  /// [setViewPath] is a method that sets the default path of views of the application.
-  Application setViewPath(String viewPath) {
-    this.viewPath = viewPath;
-    return this;
-  }
-
-  /// [setViewEngine] is a method that sets the default viewEngine of views of the application.
-  Application setViewEngine(String viewEngine) {
-    this.viewEngine = viewEngine;
-    return this;
-  }
-
   /// [setNumberOfIsolates] is a method that sets the number of isolates of the application.
   /// by default it's set to 1.
   Application setNumberOfIsolates(int numberOfIsolates) {
     this.numberOfIsolates = numberOfIsolates;
-    return this;
-  }
-
-  @Deprecated("use Websocket for WS and SocketIO Server also")
-  Application useSocketIOServer(bool useSocketIOServer) {
-    socketIOServer = useSocketIOServer;
-    return this;
-  }
-
-  Application useWebSocket(bool useWebSocket) {
-    webSocket = useWebSocket;
     return this;
   }
 
@@ -269,18 +181,6 @@ class Application {
     return this;
   }
 
-  Application ws(
-      {required String path,
-      required WebsocketHandler websocketHandler,
-      List<MiddlewareHandler> middlewares = const []}) {
-    addRoute(WebsocketRoute(
-        requestMethods: [RequestMethod.get()],
-        path: path,
-        webSocketHandler: websocketHandler,
-        middlewares: middlewares));
-    return this;
-  }
-
   Application any(
       {List<RequestMethod> requestMethods = const [RequestMethod.all()],
       required String path,
@@ -290,18 +190,6 @@ class Application {
         requestMethods: requestMethods,
         path: path,
         requestHandler: requestHandler,
-        middlewares: middlewares));
-    return this;
-  }
-
-  Application socketIO(
-      {required SocketIOHandler socketIOHandler,
-      List<MiddlewareHandler> middlewares = const [],
-      String path = '/socket.io/'}) {
-    addRoute(WebsocketRoute(
-        requestMethods: [RequestMethod.get()],
-        path: path,
-        webSocketHandler: socketIOHandler,
         middlewares: middlewares));
     return this;
   }
@@ -317,18 +205,15 @@ class Application {
 
     await Future.wait(List.generate(
         _supervisors.length, (index) => _supervisors[index].initState()));
-    final TemplateRender templateRender = TemplateRender(_instance.cache);
-    templateRender.rootPath = _instance.viewPath;
     final ServerInput serverInput = ServerInput(
-        _instance.port,
-        _instance.host,
-        _instance.routers,
-        _instance.routes,
-        _instance.middlewares,
-        _instance.webSocket,
-        _instance.socketIOServer,
-        corsOptions: _instance.corsOptions,
-        securityContext: _instance.securityContext);
+      _instance.port,
+      _instance.host,
+      _instance.routers,
+      _instance.routes,
+      _instance.middlewares,
+      corsOptions: _instance.corsOptions,
+      securityContext: _instance.securityContext,
+    );
     ServerContext serverContext = ServerContext(actorContainers);
     ServerInfo? serverInfo;
 
@@ -342,9 +227,8 @@ class Application {
         serverInfo ??= event.serverInfo;
       });
 
-      templateRender.rootPath = _instance.viewPath;
-      await _supervisors[i].start(ServerTaskHandler(
-          i, true, templateRender, serverInput, serverContext));
+      await _supervisors[i]
+          .start(ServerTaskHandler(i, true, serverInput, serverContext));
 
       subscription.cancel();
       subscriptionServerInfo.cancel();

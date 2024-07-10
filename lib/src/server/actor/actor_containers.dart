@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../../fennec.dart';
 
 ///[ActorContainers] contains all [ActorContainer] that are used to send Data to actors
 class ActorContainers {

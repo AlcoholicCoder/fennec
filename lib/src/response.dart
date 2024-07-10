@@ -1,4 +1,4 @@
-part of fennec;
+part of '../fennec.dart';
 
 /// [Response] is a class that contains the response of the server.
 /// It's used to get the response of the server.
@@ -6,8 +6,6 @@ class Response {
   /// [_response] is a [HttpResponse] that contains the http response of the server.
   final HttpResponse _response;
 
-  /// [templateRender] is a [Application] that contains the application of the server.
-  final TemplateRender templateRender;
   Object? _body;
   bool isClosed = false;
 
@@ -15,7 +13,7 @@ class Response {
   final String method;
 
   /// constructor that creates a new [Response] object.
-  Response(this._response, this.templateRender, this.method);
+  Response(this._response, this.method);
 
   Response html() {
     headers.contentType = ContentType.html;
@@ -43,64 +41,6 @@ class Response {
     _response.redirect(Uri.parse(path), status: status);
     return this;
   }
-
-  /// [render] is a method that renders the response.
-  /// It's used to render the response.
-  /// [viewName] is a [String] that contains the name of the view.
-  /// [locals] is a [Map] that contains the locals. by default it's null.
-  Response render(String viewName,
-      {Map<String, dynamic>? locals,
-      Map<String, dynamic> parameters = const {}}) {
-    isClosed = true;
-    if (method.toUpperCase() != 'GET') {
-      badRequestException(
-          _response, 'Only GET method is allowed to render html templates');
-    }
-    templateRender.render(viewName, locals, (err, data) {
-      if (err != null) {
-        _response
-          ..statusCode = HttpStatus.badRequest
-          ..write(err)
-          ..close();
-        return;
-      }
-      _html(data);
-    }, parameters: parameters);
-
-    return this;
-  }
-
-  void _html(dynamic body) {
-    headers.contentType = ContentType.html;
-    _response.write(body);
-    close();
-  }
-
-  Response renderHtmlAsString(String htmlInput,
-      {Map<String, dynamic> parameters = const {}}) {
-    if (method.toUpperCase() != 'GET') {
-      badRequestException(
-          _response, 'Only GET method is allowed to render html templates');
-      return this;
-    }
-    var data =
-        templateRender.renderHtmlAsString(htmlInput, parameters: parameters);
-    _body = data;
-    headers.contentType = ContentType.html;
-    return this;
-  }
-
-  /*/// [html] is a method that sends the response as html.
-  void html(String html) {
-    headers.contentType = ContentType.html;
-    send(html);
-  }
-
-  /// [json] is a method that sends the response as json.
-  void json(Map body) {
-    headers.contentType = ContentType.json;
-    send(jsonEncode(body));
-  }*/
 
   /// set the [headerName] and [headerContent]
   Response set(String headerName, dynamic headerContent) {

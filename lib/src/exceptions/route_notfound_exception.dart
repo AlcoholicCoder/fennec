@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 /// [routeNotFoundException] is a public function that is used throw a route not found exception.
 void routeNotFoundException(HttpResponse response, String path, String method) {

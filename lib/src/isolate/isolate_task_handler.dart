@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 ///[IsolateTaskHandler] is an abstract class that will handle different Task of isolates.
 abstract class IsolateTaskHandler {

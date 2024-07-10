@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../../fennec.dart';
 
 /// [ActorAction] is an abstract class to determine different Agent Actions.
 abstract class ActorAction {}

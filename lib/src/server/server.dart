@@ -1,10 +1,9 @@
-part of fennec;
+part of '../../fennec.dart';
 
 /// [Server] is a class that contains information about the server.
 class Server {
   /// [serverInput] is a [Application] that contains the application.
   late ServerInput serverInput;
-  late TemplateRender templateRender;
   late ServerContext serverContext;
 
   /// [_httpServer] is a [HttpServer] that contains the http server.
@@ -22,11 +21,9 @@ class Server {
 
   /// [Server] is a constructor that creates a new [Server] object.
   /// It's used to create a new [Server] object.
-  factory Server(ServerInput serverInput, TemplateRender templateRender,
-      ServerContext serverContext) {
+  factory Server(ServerInput serverInput, ServerContext serverContext) {
     _instance.serverContext = serverContext;
     _instance.serverInput = serverInput;
-    _instance.templateRender = templateRender;
     return _instance;
   }
 
@@ -41,17 +38,6 @@ class Server {
   void setRequestTimeOut(Duration duration) {
     _instance.requestTimeOut = duration;
   }
-
-  final StreamController<UpgradedWebSocket> _webSocketStream =
-      StreamController();
-  final StreamController<HttpRequest> httpServerStream = StreamController();
-
-  StreamController<UpgradedWebSocket> get webSocketStream => _webSocketStream;
-  final StreamController<UpgradedWebSocket> _webSocketStreamBroadcast =
-      StreamController();
-
-  StreamController<UpgradedWebSocket> get webSocketStreamBroadcast =>
-      _webSocketStreamBroadcast;
 
   HttpServer get httpServer => _instance._httpServer == null
       ? throw Exception("you should start first")
@@ -95,21 +81,13 @@ class Server {
     _instance._listeningToServer = true;
 
     print(
-        'Server is running on host: ${serverInput.host} port:  ${serverInput.port}   instance Nr: ${instance + 1}\n');
+        'Server is running on: http://${serverInput.host}:${serverInput.port} - Isolate: ${instance + 1}');
     return serverInfo;
   }
 
   Future<bool> _handleRequest(HttpRequest httpRequest) async {
     if (httpRequest.headers.value('Upgrade') == null) {
       return handleHttpRequest(httpRequest);
-    } else if (httpRequest.headers.value("Upgrade") != null &&
-        httpRequest.headers.value("Upgrade") == "websocket") {
-      if (WebSocketTransformer.isUpgradeRequest(httpRequest)) {
-        if (serverInput.useWebSocket) {
-          return handleHttpRequest(httpRequest);
-        }
-      }
-      return true;
     }
     return true;
   }
@@ -125,7 +103,7 @@ class Server {
       return true;
     }
     Request request = await BodyParser.parseBody(httpRequest, {});
-    Response response = Response(httpRequest.response, templateRender, method);
+    Response response = Response(httpRequest.response, method);
 
     if (serverInput.corsOptions != null) {
       var corsCallback = cors(serverInput.corsOptions!);
@@ -179,18 +157,7 @@ class Server {
             }
           }
 
-          if (route is WebsocketRoute &&
-              route.path == path &&
-              route.requestMethods.first.requestMethod ==
-                  RequestMethod.get().requestMethod) {
-            if (httpRequest.headers.value("Upgrade") != null &&
-                httpRequest.headers.value("Upgrade") == "websocket") {
-              if (WebSocketTransformer.isUpgradeRequest(httpRequest)) {
-                await route.webSocketHandler(
-                    serverContext, request.httpRequest);
-              }
-            }
-          } else if (route is Route) {
+          if (route is Route) {
             Response sentResponse =
                 await route.requestHandler(serverContext, request, response);
             if (!sentResponse.isClosed) {
@@ -229,12 +196,6 @@ class Server {
               path: composedPath,
               requestHandler: route.requestHandler,
               middlewares: middlewareHandlers));
-        } else if (route is WebsocketRoute) {
-          registeredRoutes.add(WebsocketRoute(
-              requestMethods: route.requestMethods,
-              path: composedPath,
-              webSocketHandler: route.webSocketHandler,
-              middlewares: middlewareHandlers));
         }
       }
     }
@@ -245,10 +206,4 @@ class Server {
   }
 
   void _unawaited(Future then) {}
-}
-
-class ServerConfig {
-  final int port = 80;
-  final String host = "0.0.0.0";
-// ...
 }

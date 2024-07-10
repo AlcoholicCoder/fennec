@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../../fennec.dart';
 
 class ActorTaskHandler extends IsolateTaskHandler {
   final Actor _actor;

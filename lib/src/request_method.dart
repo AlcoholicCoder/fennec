@@ -1,4 +1,4 @@
-part of fennec;
+part of '../fennec.dart';
 
 /// [RequestMethod] is a class that contains information about the request method.
 class RequestMethod {

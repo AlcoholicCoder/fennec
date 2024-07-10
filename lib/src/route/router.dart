@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 abstract class ARouter {
   String routerPath = '';
@@ -113,30 +113,6 @@ class Router extends ARouter {
         requestMethods: requestMethods,
         path: path,
         requestHandler: requestHandler,
-        middlewares: middlewares));
-    return this;
-  }
-
-  Router ws(
-      {required String path,
-      required WebsocketHandler websocketHandler,
-      List<MiddlewareHandler> middlewares = const []}) {
-    _routes.add(WebsocketRoute(
-        requestMethods: [RequestMethod.get()],
-        path: path,
-        webSocketHandler: websocketHandler,
-        middlewares: middlewares));
-    return this;
-  }
-
-  Router socketIO(
-      {required SocketIOHandler socketIOHandler,
-      List<MiddlewareHandler> middlewares = const [],
-      String path = '/socket.io/'}) {
-    _routes.add(WebsocketRoute(
-        requestMethods: [RequestMethod.get()],
-        path: path,
-        webSocketHandler: socketIOHandler,
         middlewares: middlewares));
     return this;
   }

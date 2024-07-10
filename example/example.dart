@@ -1,17 +1,13 @@
 import 'dart:async';
-
 import 'package:fennec/fennec.dart';
-import 'package:path/path.dart' as path;
 
 void main(List<String> arguments) async {
   Application application = Application();
 
   application.setNumberOfIsolates(1);
-  application.useWebSocket(true);
   application.setPort(8000);
   application.addRouters([testRouter()]);
   application.addActor(CustomisedActor("customizedActor"));
-  application.setViewPath('${path.current}/example');
 
   ServerInfo serverInfo = await application.runServer();
   print("Server is running at Port ${serverInfo.port}");
@@ -35,14 +31,6 @@ Router testRouter() {
     return Stop(res.forbidden(body: {"error": "not allowed"}).json());
   });
 
-  router.socketIO(
-      socketIOHandler: (context, websocket) {
-        print('Socket is coming');
-
-        /// handle new connected websocket client.
-      },
-      path: "/socket.io/");
-
   router.get(
       path: "/test/{id}",
       requestHandler: (context, req, res) async {
@@ -53,44 +41,13 @@ Router testRouter() {
         return res.ok(body: {"id": req.pathParams['id']}).json();
       });
 
-  router.routerInitState(routerInitState: (ServerContext context) async {});
-
-  router.get(
-      path: "/test_template/{id}",
-      requestHandler: (context, req, res) async {
-        print(req.pathParams['id']);
-        return res.renderHtmlAsString(
-            "<!DOCTYPE html <html> <body><h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3><h4>Heading 4</h4><h5>Heading 5</h5><h6>Heading 6</h6></body></html>");
-      });
-  router.get(
-      path: "/file",
-      requestHandler: (context, req, res) {
-        return res.ok(body: {'ss': 12}).text();
-      });
-  router.any(
-      path: "/",
-      requestMethods: [RequestMethod.get(), RequestMethod.post()],
-      requestHandler: (context, req, res) {
-        return res.ok(body: {'ss': 12}).text();
-      });
-  router.ws(
-      path: "/connect1",
-      websocketHandler: (context, websocket) {
-        /// handle new connected websocket client.
-      });
-  router.get(
-      path: "/template",
-      requestHandler: (context, req, res) {
-        return res.render("file");
-      });
-
   return router;
 }
 
 class CustomisedActor extends Actor {
   final List<String> _strings = [];
 
-  CustomisedActor(String name) : super(name);
+  CustomisedActor(super.name);
 
   @override
   FutureOr<void> execute(String action,

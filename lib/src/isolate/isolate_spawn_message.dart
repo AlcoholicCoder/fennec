@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 class IsolateSpawnMessage {
   final SendPort supervisorPort;

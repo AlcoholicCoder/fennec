@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 ///[IsolateHandler] is a class for handling different events between isolates.
 class IsolateHandler {

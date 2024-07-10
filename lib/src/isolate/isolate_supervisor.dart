@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 class IsolateSupervisor {
   final StreamController _messageController = StreamController.broadcast();

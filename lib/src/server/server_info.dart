@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 /// [ServerInfo] is a class that contains information about the server.
 /// It's used to get information about the server.

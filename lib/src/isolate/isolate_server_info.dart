@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 ///[IsolateServerIfo] a class that contains an instance of [ServerInfo] that will be shared between isolates.
 class IsolateServerInfo {

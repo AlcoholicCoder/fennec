@@ -1,4 +1,4 @@
-part of fennec;
+part of '../../fennec.dart';
 
 FutureOr<Middleware> Function(Request request, Response response) cors(
     CorsOptions corsOptions) {
