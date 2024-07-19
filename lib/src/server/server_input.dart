@@ -2,7 +2,7 @@ part of '../../fennec.dart';
 
 class ServerInput {
   final int port;
-  final String host;
+  final dynamic host;
   final List<ARoute> routes;
   final List<Router> routers;
   CorsOptions? corsOptions;
