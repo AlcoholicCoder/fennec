@@ -70,13 +70,16 @@ class Server {
         _instance._httpServer!.serverHeader);
     if (_instance._listeningToServer) return serverInfo;
     _instance._httpServer!.listen(((event) async {
-      await _handleRequest(event).timeout(_instance.requestTimeOut != null
-          ? _instance.requestTimeOut!
-          : Duration(seconds: 120));
-      /* Duration(seconds: 120), onTimeout: () {
-        throw TimeoutException(
-            'the requests takes more than the specified timeout');
-      }); */
+      await _handleRequest(event).timeout(
+        _instance.requestTimeOut != null
+            ? _instance.requestTimeOut!
+            : Duration(seconds: 120),
+        onTimeout: () {
+          return true;
+          throw TimeoutException(
+              'the requests takes more than the specified timeout');
+        },
+      );
     }));
     _instance._listeningToServer = true;
 
